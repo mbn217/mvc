@@ -24,7 +24,6 @@ public class PersonController {
     @ResponseBody
     public Map<String, Object> queryAllPersons() {
         try {
-            System.out.println(1 / 0);
             List<Person> persons = personService.queryPersons();
             return GenResult.SUCCESS.genResult(persons);
         } catch (Exception e) {
