@@ -13,4 +13,17 @@ public class LogUtil {
     public static void error(Exception e) {
         log.error(e, e);
     }
+
+    public static void info(Object msg) {
+        log.info(msg);
+        log.debug(msg);
+    }
+
+    public static void debug(Object msg) {
+        log.debug(msg);
+    }
+
+    public static void fatal(Exception e) {
+        log.fatal(e);
+    }
 }
