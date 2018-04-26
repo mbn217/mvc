@@ -14,12 +14,12 @@ public class PersonDao {
     private JdbcTemplate jdbcTemplate;
 
     public List<Person> queryPersons() {
-        String sql = "SELECT `id`, `name` FROM `person`";
+        String sql = "SELECT `id`, `user_name`, `age` FROM `person`";
         return jdbcTemplate.query(sql, new PersonMapper());
     }
 
     public Person queryPersonById(int id) {
-        String sql = "SELECT `id`, `name` FROM `person` WHERE `id` = ?";
+        String sql = "SELECT `id`, `user_name`, `age` FROM `person` WHERE `id` = ?";
         List<Person> list = jdbcTemplate.query(sql, new PersonMapper(), id);
         if (list.size() > 0) {
             return list.get(0);
