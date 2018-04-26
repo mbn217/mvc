@@ -1,4 +1,4 @@
-package net.ys.util;
+package com.yx.util;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -8,15 +8,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 根据mysql数据库直接生成BeanResponse.java文件
+ * 根据mysql数据库直接生成BeanMapper.java文件
  * User: LiWenC
  * Date: 17-5-10
  */
-public class GenerateBeanRespMapper {
+public class GenerateMapper {
     static Connection connection = null;
     static Statement statement = null;
     static ResultSet rs = null;
-    static String genPath = "D:/bean/ResponseMapper/";
+    static String genPath = "D:/bean/mapper/";
     static String oneEnter = "\r\n";
     static String twoEnter = "\r\n\r\n";
     static String oneTabStr = "\t";
@@ -43,63 +43,50 @@ public class GenerateBeanRespMapper {
 
         if (tables.size() > 0) {
             String sql = "SELECT COLUMN_NAME, DATA_TYPE, COLUMN_COMMENT FROM information_schema.`COLUMNS` WHERE TABLE_NAME = '%s' AND TABLE_SCHEMA='" + dbName + "'";
+            String columnDb;//数据库中字段名称
             String columnName;
             String columnClassName;
-            String columnComment;
-            String fileName;
+            String beanName;
+            String classObject;
+            String className;
             FileWriter fileWriter;
-            String columnClass;
             String attributeType = "";
             for (String table : tables) {
-                fileName = camelFormat(table, true);
+                beanName = camelFormat(table, true);
+                classObject = camelFormat(table, false);
+                className = beanName + "Mapper";
 
-                fileWriter = new FileWriter(genPath + fileName + "Response.java");
+                fileWriter = new FileWriter(genPath + className + ".java");
+                fileWriter.write("import net.ys.bean." + beanName + ";" + oneEnter);
+                fileWriter.write("import org.springframework.jdbc.core.RowMapper;" + oneEnter);
+                fileWriter.write("import java.sql.ResultSet;" + oneEnter);
+                fileWriter.write("import java.sql.SQLException;" + twoEnter);
 
-                fileWriter.write("import io.swagger.annotations.ApiModelProperty;" + twoEnter);
-                fileWriter.write("public class " + fileName + "Response {" + twoEnter);
+                fileWriter.write("public class " + className + " implements RowMapper<" + beanName + "> {" + oneEnter);
+                fileWriter.write(oneTabStr + "@Override" + oneEnter);
+                fileWriter.write(oneTabStr + "public " + beanName + " mapRow(ResultSet resultSet, int i) throws SQLException {" + oneEnter);
+                fileWriter.write(twoTabStr + beanName + " " + classObject + " = new " + beanName + "();" + oneEnter);
 
                 statement = connection.createStatement();
                 rs = statement.executeQuery(String.format(sql, table));
                 while (rs.next()) {
-                    columnName = rs.getString("COLUMN_NAME").toLowerCase();
+                    columnDb = rs.getString("COLUMN_NAME").toLowerCase();
+                    columnName = camelFormat(rs.getString("COLUMN_NAME"), true);
                     columnClassName = rs.getString("DATA_TYPE");
-                    columnComment = rs.getString("COLUMN_COMMENT");
 
                     if ("varchar".equals(columnClassName) || "mediumtext".equals(columnClassName)) {
                         attributeType = "String";
                     } else if ("int".equals(columnClassName)) {
-                        attributeType = "int";
+                        attributeType = "Int";
                     } else if ("bigint".equals(columnClassName)) {
-                        attributeType = "long";
+                        attributeType = "Long";
                     } else if ("decimal".equals(columnClassName)) {
                         attributeType = "BigDecimal";
                     }
-                    fileWriter.write(oneTabStr + "@ApiModelProperty(value = \"" + columnComment + "\")" + oneEnter);
-                    fileWriter.write(oneTabStr + "private " + attributeType + " " + columnName + ";" + twoEnter);
+                    fileWriter.write(twoTabStr + classObject + ".set" + columnName + "(resultSet.get" + attributeType + "(\"" + columnDb + "\"));" + oneEnter);
                 }
-
-                rs = statement.executeQuery(String.format(sql, table));
-
-                while (rs.next()) {
-                    columnName = rs.getString("COLUMN_NAME").toLowerCase();
-                    columnClassName = rs.getString("DATA_TYPE");
-                    columnClass = firstToUpperCase(columnName);
-
-                    if ("varchar".equals(columnClassName) || "mediumtext".equals(columnClassName)) {
-                        attributeType = "String";
-                    } else if ("int".equals(columnClassName)) {
-                        attributeType = "int";
-                    } else if ("bigint".equals(columnClassName)) {
-                        attributeType = "long";
-                    } else if ("decimal".equals(columnClassName)) {
-                        attributeType = "BigDecimal";
-                    }
-
-                    fileWriter.write(oneTabStr + "public void set" + columnClass + "(" + attributeType + " " + columnName + ") {" + oneEnter);
-                    fileWriter.write(twoTabStr + "this." + columnName + " = " + columnName + ";" + oneEnter + "    }" + twoEnter);
-                    fileWriter.write(oneTabStr + "public " + attributeType + " get" + columnClass + "() {" + oneEnter);
-                    fileWriter.write(twoTabStr + "return this." + columnName + ";" + oneEnter + "    }" + twoEnter);
-                }
+                fileWriter.write(twoTabStr + "return " + classObject + ";" + oneEnter);
+                fileWriter.write(oneTabStr + "}" + oneEnter);
                 fileWriter.write("}");
                 fileWriter.close();
             }

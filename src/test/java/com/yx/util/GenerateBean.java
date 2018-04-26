@@ -1,4 +1,4 @@
-package net.ys.util;
+package com.yx.util;
 
 import java.io.File;
 import java.io.FileWriter;
