@@ -3,7 +3,7 @@ package com.yx.controller;
 import com.yx.bean.Person;
 import com.yx.constant.GenResult;
 import com.yx.service.PersonService;
-import org.apache.log4j.Logger;
+import com.yx.util.LogUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,16 +20,15 @@ public class PersonController {
     @Resource
     private PersonService personService;
 
-    private static Logger log = Logger.getLogger(PersonController.class);
-
     @RequestMapping(value = "queryAllPersons")
     @ResponseBody
     public Map<String, Object> queryAllPersons() {
         try {
+            System.out.println(1 / 0);
             List<Person> persons = personService.queryPersons();
             return GenResult.SUCCESS.genResult(persons);
         } catch (Exception e) {
-            log.error(e, e);
+            LogUtil.error(e);
             return GenResult.FAILED.genResult();
         }
     }
@@ -41,7 +40,7 @@ public class PersonController {
             Person person = personService.getPersonById(id);
             return GenResult.SUCCESS.genResult(person);
         } catch (Exception e) {
-            log.error(e, e);
+            LogUtil.error(e);
             return GenResult.FAILED.genResult();
         }
     }
