@@ -16,7 +16,6 @@ public class LogUtil {
 
     public static void info(Object msg) {
         log.info(msg);
-        log.debug(msg);
     }
 
     public static void debug(Object msg) {
@@ -24,6 +23,6 @@ public class LogUtil {
     }
 
     public static void fatal(Exception e) {
-        log.fatal(e);
+        log.fatal(e, e);
     }
 }
