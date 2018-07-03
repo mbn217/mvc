@@ -28,7 +28,7 @@ public class PersonController {
             return GenResult.SUCCESS.genResult(persons);
         } catch (Exception e) {
             LogUtil.error(e);
-            return GenResult.FAILED.genResult();
+            return GenResult.UNKNOWN_ERROR.genResult();
         }
     }
 
@@ -40,7 +40,7 @@ public class PersonController {
             return GenResult.SUCCESS.genResult(person);
         } catch (Exception e) {
             LogUtil.error(e);
-            return GenResult.FAILED.genResult();
+            return GenResult.UNKNOWN_ERROR.genResult();
         }
     }
 }
